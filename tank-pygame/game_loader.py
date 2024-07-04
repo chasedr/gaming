@@ -133,6 +133,21 @@ class Game:
         # 基地是否是砖块
         self.iron_time = 0
 
+
+        pygame.joystick.init()
+
+        # 打开第一个游戏手柄
+        print("joystick count :", pygame.joystick.get_count() )
+        self.joystick0 = pygame.joystick.Joystick(0)
+        print("joystick ssid: ", self.joystick0.get_guid())
+        print("joystick instanc id: ", self.joystick0.get_instance_id())
+        self.joystick0.init()
+        # 打开第二个游戏手柄
+        self.joystick1 = pygame.joystick.Joystick(1)
+        print("joystick ssid: ", self.joystick1.get_guid())
+        print("joystick instanc id: ", self.joystick1.get_instance_id())
+        self.joystick1.init()
+
     # 暂停函数----------------------------------------------------------------
     # 功能：点击鼠标进行暂停 并显示图片在桌面
     def game_pause(self):
@@ -268,7 +283,21 @@ class Game:
     # 玩家操作检测函数--------------------------------------------------------
     # 功能：对键盘进行检测 并对玩家一和玩家二的操作进行移动
     def operation_detection_section(self):
+
+
+        # print(self.joystick0.get_button(0))
+        # print(self.joystick0.get_hat(0)[0], self.joystick0.get_hat(0)[1])
+        #上0，1
+        #下0，-1
+        #左-1， 0
+        #右1，0
+
+
         key_pressed = pygame.key.get_pressed()
+        joystick0_buttonA = self.joystick0.get_button(0)
+        joystick0_hat0 = self.joystick0.get_hat(0)
+        joystick1_buttonA = self.joystick1.get_button(0)
+        joystick1_hat0 = self.joystick1.get_hat(0)
         # 玩家一的移动、射击操作
         # 参数 moving movdir alltankGroup self.bgMap.brickGroup, self.bgMap.ironGroup,self.bgMap.riverGroup
         if self.myTank_T1.life > 0:  # 如果有生命
@@ -304,7 +333,8 @@ class Game:
                     self.running_T1 = True
 
             if not self.moving:
-                if key_pressed[pygame.K_w]:
+                #if key_pressed[pygame.K_w]:
+                if(joystick0_hat0[0] == 0 and joystick0_hat0[1] == 1):
                     self.moving = 7
                     self.movdir = 0
                     self.running_T1 = True
@@ -313,7 +343,8 @@ class Game:
                                              self.bgMap.riverGroup):
                         self.moving = 0
                     self.allTankGroup.add(self.myTank_T1)
-                elif key_pressed[pygame.K_s]:
+                # elif key_pressed[pygame.K_s]:
+                elif(joystick0_hat0[0] == 0 and joystick0_hat0[1] == -1):
                     self.moving = 7
                     self.movdir = 1
                     self.running_T1 = True
@@ -322,7 +353,8 @@ class Game:
                                                self.bgMap.riverGroup):
                         self.moving = 0
                     self.allTankGroup.add(self.myTank_T1)
-                elif key_pressed[pygame.K_a]:
+                # elif key_pressed[pygame.K_a]:
+                elif(joystick0_hat0[0] == -1 and joystick0_hat0[1] == 0):
                     self.moving = 7
                     self.movdir = 2
                     self.running_T1 = True
@@ -331,7 +363,8 @@ class Game:
                                                self.bgMap.riverGroup):
                         self.moving = 0
                     self.allTankGroup.add(self.myTank_T1)
-                elif key_pressed[pygame.K_d]:
+                # elif key_pressed[pygame.K_d]:
+                elif(joystick0_hat0[0] == 1 and joystick0_hat0[1] == 0):
                     self.moving = 7
                     self.movdir = 3
                     self.running_T1 = True
@@ -341,7 +374,8 @@ class Game:
                         self.moving = 0
                     self.allTankGroup.add(self.myTank_T1)
             # 如果按j 则是坦克1发射子弹
-            if key_pressed[pygame.K_j]:
+            # if key_pressed[pygame.K_j]:
+            if(joystick0_buttonA == 1):
                 if not self.myTank_T1.bullet.life and self.myTank_T1.bulletNotCooling:
                     if self.isSoundEffect:
                         self.attack_sound.play()
@@ -378,7 +412,8 @@ class Game:
                     self.running_T2 = True
 
             if not self.moving2:
-                if key_pressed[pygame.K_UP]:
+                #if key_pressed[pygame.K_UP]:
+                if(joystick1_hat0[0] == 0 and joystick1_hat0[1] == 1):
                     self.allTankGroup.remove(self.myTank_T2)
                     self.myTank_T2.moveUp(self.allTankGroup, self.bgMap.brickGroup, self.bgMap.ironGroup,
                                           self.bgMap.riverGroup)
@@ -386,7 +421,8 @@ class Game:
                     self.moving2 = 7
                     self.movdir2 = 0
                     self.running_T2 = True
-                elif key_pressed[pygame.K_DOWN]:
+                #elif key_pressed[pygame.K_DOWN]:
+                elif(joystick1_hat0[0] == 0 and joystick1_hat0[1] == -1):
                     self.allTankGroup.remove(self.myTank_T2)
                     self.myTank_T2.moveDown(self.allTankGroup, self.bgMap.brickGroup, self.bgMap.ironGroup,
                                             self.bgMap.riverGroup)
@@ -394,7 +430,8 @@ class Game:
                     self.moving2 = 7
                     self.movdir2 = 1
                     self.running_T2 = True
-                elif key_pressed[pygame.K_LEFT]:
+                #elif key_pressed[pygame.K_LEFT]:
+                elif(joystick1_hat0[0] == -1 and joystick1_hat0[1] == 0):
                     self.allTankGroup.remove(self.myTank_T2)
                     self.myTank_T2.moveLeft(self.allTankGroup, self.bgMap.brickGroup, self.bgMap.ironGroup,
                                             self.bgMap.riverGroup)
@@ -402,7 +439,8 @@ class Game:
                     self.moving2 = 7
                     self.movdir2 = 2
                     self.running_T2 = True
-                elif key_pressed[pygame.K_RIGHT]:
+                #elif key_pressed[pygame.K_RIGHT]:
+                elif(joystick1_hat0[0] == 1 and joystick1_hat0[1] == 0):
                     self.allTankGroup.remove(self.myTank_T2)
                     self.myTank_T2.moveRight(self.allTankGroup, self.bgMap.brickGroup, self.bgMap.ironGroup,
                                              self.bgMap.riverGroup)
@@ -411,7 +449,8 @@ class Game:
                     self.movdir2 = 3
                     self.running_T2 = True
             # 如果点击0 则是发射子弹
-            if key_pressed[pygame.K_KP0]:
+            # if key_pressed[pygame.K_KP0]:
+            if(joystick1_buttonA == 1):
                 if not self.myTank_T2.bullet.life:
                     if self.isSoundEffect:
                         self.attack_sound.play()

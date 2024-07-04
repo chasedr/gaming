@@ -32,6 +32,35 @@ def main():
     # -----------------------------------
 
     pygame.init()
+    # pygame.joystick.init()
+
+    # # 打开第一个游戏手柄
+    # print("joystick count :", pygame.joystick.get_count() )
+    # joystick0 = pygame.joystick.Joystick(0)
+    # print("joystick ssid: ", joystick0.get_guid())
+    # print("joystick instanc id: ", joystick0.get_instance_id())
+
+    # # 主循环
+    # running = True
+    # while running:
+    #     for event in pygame.event.get():
+    #         print(event)
+    #         if event.type == pygame.QUIT:
+    #             running = False
+    #         elif event.type == pygame.JOYBUTTONDOWN:
+    #             # print(event.joy)
+    #             # print(event.instance_id)
+    #             print(f"{event.joy} Button {event.button} pressed")
+    #         elif event.type == pygame.JOYBUTTONUP:
+    #             print(f"{event.joy} Button {event.button} released")
+    #         elif event.type == pygame.JOYAXISMOTION:
+    #             print(f"{event.joy} Axis {event.axis} value: {joystick0.get_axis(event.axis)}")
+    #         elif event.type == pygame.JOYHATMOTION:
+    #             print(f"{event.joy} Hat {event.hat} value: {joystick0.get_hat(event.hat)}")
+
+    # pygame.quit()
+
+
     surface = pygame.display.set_mode((750, 630))
 
     # 创建加载界面的图片
