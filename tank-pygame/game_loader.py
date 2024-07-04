@@ -97,8 +97,11 @@ class Game:
         self.movdir = 0
         self.moving2 = 0
         self.movdir2 = 0
+        self.moving3 = 0
+        self.movdir3 = 0
         self.running_T1 = True
         self.running_T2 = True
+        self.running_T3 = True
 
         self.enemyNumber = 3
         self.enemyCouldMove = True
@@ -109,6 +112,7 @@ class Game:
         # 关于保护罩的参数
         self.invincible_T1 = 200  # 是否无敌
         self.invincible_T2 = 200
+        self.invincible_T3 = 200
 
         self.clock = pygame.time.Clock()
 
@@ -123,6 +127,9 @@ class Game:
         self.myTank_T2 = myTank.MyTank(2)
         self.allTankGroup.add(self.myTank_T2)
         self.mytankGroup.add(self.myTank_T2)
+        self.myTank_T3 = myTank.MyTank(3)
+        self.allTankGroup.add(self.myTank_T3)
+        self.mytankGroup.add(self.myTank_T3)
 
         # 创建食物/道具 但不显示
         self.prop = food.Food()
@@ -136,17 +143,19 @@ class Game:
 
         pygame.joystick.init()
 
-        # 打开第一个游戏手柄
         print("joystick count :", pygame.joystick.get_count() )
+        # 打开第一个游戏手柄
         self.joystick0 = pygame.joystick.Joystick(0)
         print("joystick ssid: ", self.joystick0.get_guid())
         print("joystick instanc id: ", self.joystick0.get_instance_id())
         self.joystick0.init()
+
         # 打开第二个游戏手柄
-        self.joystick1 = pygame.joystick.Joystick(1)
-        print("joystick ssid: ", self.joystick1.get_guid())
-        print("joystick instanc id: ", self.joystick1.get_instance_id())
-        self.joystick1.init()
+        if(pygame.joystick.get_count() == 2):
+            self.joystick1 = pygame.joystick.Joystick(1)
+            print("joystick ssid: ", self.joystick1.get_guid())
+            print("joystick instanc id: ", self.joystick1.get_instance_id())
+            self.joystick1.init()
 
     # 暂停函数----------------------------------------------------------------
     # 功能：点击鼠标进行暂停 并显示图片在桌面
@@ -180,10 +189,17 @@ class Game:
 
             pygame.display.flip()
             key_pressed = pygame.key.get_pressed()
+            joystick0_buttonback = self.joystick0.get_button(6)
+
             # 按esc退出游戏
             if key_pressed[pygame.K_ESCAPE]:
                 self.start_sound.stop()
                 return 0
+            
+            if joystick0_buttonback:
+                self.start_sound.stop()
+                return 0
+            
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -382,7 +398,7 @@ class Game:
                     self.myTank_T1.shoot()
                     self.myTank_T1.bulletNotCooling = False
 
-        # 玩家二的移动操作
+        #玩家二的移动操作
         if self.myTank_T2.life > 0:
             if self.moving2:
                 self.moving2 -= 1
@@ -457,6 +473,78 @@ class Game:
                     self.myTank_T2.shoot()
                     self.myTank_T2.bulletNotCooling = False
 
+        #玩家三的移动操作
+        if self.myTank_T3.life > 0:
+            if self.moving3:
+                self.moving3 -= 1
+                if self.movdir3 == 0:
+                    self.allTankGroup.remove(self.myTank_T3)
+                    self.myTank_T3.moveUp(self.allTankGroup, self.bgMap.brickGroup, self.bgMap.ironGroup,
+                                          self.bgMap.riverGroup)
+                    self.allTankGroup.add(self.myTank_T3)
+                    self.running_T3 = True
+                if self.movdir3 == 1:
+                    self.allTankGroup.remove(self.myTank_T3)
+                    self.myTank_T3.moveDown(self.allTankGroup, self.bgMap.brickGroup, self.bgMap.ironGroup,
+                                            self.bgMap.riverGroup)
+                    self.allTankGroup.add(self.myTank_T3)
+                    self.running_T3 = True
+                if self.movdir3 == 2:
+                    self.allTankGroup.remove(self.myTank_T3)
+                    self.myTank_T3.moveLeft(self.allTankGroup, self.bgMap.brickGroup, self.bgMap.ironGroup,
+                                            self.bgMap.riverGroup)
+                    self.allTankGroup.add(self.myTank_T3)
+                    self.running_T3 = True
+                if self.movdir3 == 3:
+                    self.allTankGroup.remove(self.myTank_T3)
+                    self.myTank_T3.moveRight(self.allTankGroup, self.bgMap.brickGroup, self.bgMap.ironGroup,
+                                             self.bgMap.riverGroup)
+                    self.allTankGroup.add(self.myTank_T3)
+                    self.running_T3 = True
+
+            if not self.moving3:
+                if key_pressed[pygame.K_UP]:
+                    self.allTankGroup.remove(self.myTank_T3)
+                    self.myTank_T3.moveUp(self.allTankGroup, self.bgMap.brickGroup, self.bgMap.ironGroup,
+                                          self.bgMap.riverGroup)
+                    self.allTankGroup.add(self.myTank_T3)
+                    self.moving3 = 7
+                    self.movdir3 = 0
+                    self.running_T3 = True
+                elif key_pressed[pygame.K_DOWN]:
+                    self.allTankGroup.remove(self.myTank_T3)
+                    self.myTank_T3.moveDown(self.allTankGroup, self.bgMap.brickGroup, self.bgMap.ironGroup,
+                                            self.bgMap.riverGroup)
+                    self.allTankGroup.add(self.myTank_T3)
+                    self.moving3 = 7
+                    self.movdir3 = 1
+                    self.running_T3 = True
+                elif key_pressed[pygame.K_LEFT]:
+                    self.allTankGroup.remove(self.myTank_T3)
+                    self.myTank_T3.moveLeft(self.allTankGroup, self.bgMap.brickGroup, self.bgMap.ironGroup,
+                                            self.bgMap.riverGroup)
+                    self.allTankGroup.add(self.myTank_T3)
+                    self.moving3 = 7
+                    self.movdir3 = 2
+                    self.running_T3 = True
+                elif key_pressed[pygame.K_RIGHT]:
+                    self.allTankGroup.remove(self.myTank_T3)
+                    self.myTank_T3.moveRight(self.allTankGroup, self.bgMap.brickGroup, self.bgMap.ironGroup,
+                                             self.bgMap.riverGroup)
+                    self.allTankGroup.add(self.myTank_T3)
+                    self.moving3 = 7
+                    self.movdir3 = 3
+                    self.running_T3 = True
+            # 如果点击0 则是发射子弹
+            if key_pressed[pygame.K_0]:
+                if not self.myTank_T3.bullet.life:
+                    if self.isSoundEffect:
+                        self.attack_sound.play()
+                    self.myTank_T3.shoot()
+                    self.myTank_T3.bulletNotCooling = False
+
+        
+
     # 坦克显示函数---------------------------------------------------------
     # 功能：对我方坦克和敌方坦克进行显示
     def tank_display_section(self):
@@ -490,7 +578,19 @@ class Game:
                 if self.invincible_T2 % 3 == 0:
                     self.special_effect.SE_protect(self.screen, self.myTank_T2.rect.left, self.myTank_T2.rect.top,
                                                    self.invincible_T2)
-
+        # 画我方坦克3
+        if self.myTank_T3.life > 0:
+            if self.switch_R1_R2_image and self.running_T3:
+                self.screen.blit(self.myTank_T3.tank_R0, (self.myTank_T3.rect.left, self.myTank_T3.rect.top))
+                self.running_T3 = False
+            else:
+                self.screen.blit(self.myTank_T3.tank_R1, (self.myTank_T3.rect.left, self.myTank_T3.rect.top))
+            # 画保护罩 坦克3
+            if self.invincible_T3 > 0:
+                self.invincible_T3 -= 1
+                if self.invincible_T3 % 3 == 0:
+                    self.special_effect.SE_protect(self.screen, self.myTank_T3.rect.left, self.myTank_T3.rect.top,
+                                                   self.invincible_T3)
         # 画敌方坦克
         for each in self.allEnemyGroup:
             # 判断5毛钱特效是否播放
@@ -674,6 +774,84 @@ class Game:
                 # 子弹 碰撞 家
             if pygame.sprite.spritecollide(self.myTank_T2.bullet, self.bgMap.homeGroup, True, None):
                 self.overGameLoss = True
+
+
+        # 绘制我方子弹3 （模仿坦克1写）
+        if self.myTank_T3.bullet.life:
+            self.myTank_T3.bullet.move()
+            self.screen.blit(self.myTank_T3.bullet.bullet, self.myTank_T3.bullet.rect)
+            # 子弹 碰撞 敌方坦克
+            if pygame.sprite.spritecollide(self.myTank_T3.bullet, self.redEnemyGroup, True, None):
+                self.prop.change()
+                if self.isSoundEffect:
+                    self.prop_sound.play()
+                self.enemyNumber -= 1
+                if not self.isEndless:
+                    self.remaining_enemy -= 1
+                self.myTank_T3.bullet.life = False
+                mid = special_effects.bulletBoom(self.myTank_T3.bullet.rect.left - 12,
+                                                 self.myTank_T3.bullet.rect.top - 12)
+                self.bulletBoomGroup.append(mid)
+            elif pygame.sprite.spritecollide(self.myTank_T3.bullet, self.greenEnemyGroup, False, None):
+                for each in self.greenEnemyGroup:
+                    if pygame.sprite.collide_rect(self.myTank_T3.bullet, each):
+                        if each.life == 1:
+                            pygame.sprite.spritecollide(self.myTank_T3.bullet, self.greenEnemyGroup, True, None)
+                            if self.isSoundEffect:
+                                self.bang_sound.play()
+                            self.enemyNumber -= 1
+                            if not self.isEndless:
+                                self.remaining_enemy -= 1
+                        elif each.life == 2:
+                            if self.isSoundEffect:
+                                self.wall_sound.play()
+                            each.life -= 1
+                            each.tank = each.enemy_3_0
+                        elif each.life == 3:
+                            if self.isSoundEffect:
+                                self.wall_sound.play()
+                            each.life -= 1
+                            each.tank = each.enemy_3_2
+                self.myTank_T3.bullet.life = False
+                mid = special_effects.bulletBoom(self.myTank_T3.bullet.rect.left - 12,
+                                                 self.myTank_T3.bullet.rect.top - 12)
+                self.bulletBoomGroup.append(mid)
+            elif pygame.sprite.spritecollide(self.myTank_T3.bullet, self.otherEnemyGroup, True, None):
+                if self.isSoundEffect:
+                    self.bang_sound.play()
+                self.enemyNumber -= 1
+                if not self.isEndless:
+                    self.remaining_enemy -= 1
+                self.myTank_T3.bullet.life = False
+                mid = special_effects.bulletBoom(self.myTank_T3.bullet.rect.left - 12,
+                                                 self.myTank_T3.bullet.rect.top - 12)
+                self.bulletBoomGroup.append(mid)
+
+            # 子弹 碰撞 brickGroup
+            if pygame.sprite.spritecollide(self.myTank_T3.bullet, self.bgMap.brickGroup, True, None):
+                if self.isSoundEffect:
+                    self.wall_sound.play()
+                self.myTank_T3.bullet.life = False
+                self.myTank_T3.bullet.rect.left, self.myTank_T3.bullet.rect.right = 3 + 12 * 24, 3 + 24 * 24
+            # 子弹 碰撞 brickGroup
+            if self.myTank_T3.bullet.strong:
+                if pygame.sprite.spritecollide(self.myTank_T3.bullet, self.bgMap.ironGroup, True, None):
+                    if self.isSoundEffect:
+                        self.wall_sound.play()
+                    self.myTank_T3.bullet.life = False
+                    self.myTank_T3.bullet.rect.left, self.myTank_T3.bullet.rect.right = 3 + 12 * 24, 3 + 24 * 24
+            else:
+                if pygame.sprite.spritecollide(self.myTank_T3.bullet, self.bgMap.ironGroup, False, None):
+                    if self.isSoundEffect:
+                        self.wall_sound.play()
+                    self.myTank_T3.bullet.life = False
+                    self.myTank_T3.bullet.rect.left, self.myTank_T3.bullet.rect.right = 3 + 12 * 24, 3 + 24 * 24
+                # 子弹 碰撞 家
+            if pygame.sprite.spritecollide(self.myTank_T3.bullet, self.bgMap.homeGroup, True, None):
+                self.overGameLoss = True
+
+
+
         # 绘制敌人子弹
         for each in self.allEnemyGroup:
             # 如果子弹没有生命，则赋予子弹生命
@@ -975,7 +1153,7 @@ class Game:
             self.otherEnemyGroup.add(enemy)
 
         # 默认是单人
-        self.myTank_T2.life = 0
+        # self.myTank_T2.life = 0
         self.start_sound.play()
         while True:
             #游戏结束
@@ -994,7 +1172,7 @@ class Game:
                     self.start_sound.stop()
                     return
             # 按键操作
-            key_pressed = pygame.key.get_pressed()
+            key_pressed = pygame.key.get_pressed()        
 
             # 按esc退出游戏
             if key_pressed[pygame.K_ESCAPE]:

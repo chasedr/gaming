@@ -26,6 +26,22 @@ def heads_up_mode(i):
 def set_up():
     pass
 
+
+# 处理摇杆输入
+def handle_joystick_input(events, menu):
+    for event in events:
+        if event.type == pygame.JOYAXISMOTION:
+            if event.axis == 1:  # 1号轴通常是垂直轴
+                if event.value < -0.5:
+                    menu.update(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_UP))
+                elif event.value > 0.5:
+                    menu.update(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_DOWN))
+        elif event.type == pygame.JOYBUTTONDOWN:
+            if event.button == 0:  # 0号按钮通常是第一个按钮
+                menu.update(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RETURN))
+
+
+
 def main():
     # ------------------------------------
     # 创建window
@@ -60,6 +76,20 @@ def main():
 
     # pygame.quit()
 
+    pygame.joystick.init()
+
+    # 检查是否有连接的摇杆
+    if pygame.joystick.get_count() == 0:
+        print("No joystick connected")
+        pygame.quit()
+        exit()
+
+    # 获取第一个连接的摇杆
+    joystick = pygame.joystick.Joystick(0)
+    joystick.init()
+
+
+
 
     surface = pygame.display.set_mode((750, 630))
 
@@ -87,9 +117,9 @@ def main():
     checkpoint_theme.widget_font_size = 25
 
     # 关卡模式“菜单”的创建
-    level_mode_menu = pygame_menu.Menu('Level Mode Menu:Choose a level', 750, 630, theme=checkpoint_theme)
+    level_mode_menu = pygame_menu.Menu('Level Mode', 750, 630, theme=checkpoint_theme)
     # 无尽模式“菜单”的创建
-    endless_mode_menu = pygame_menu.Menu('Endless Mode Menu:Choose a level', 750, 630, theme=checkpoint_theme)
+    endless_mode_menu = pygame_menu.Menu('Endless Mode', 750, 630, theme=checkpoint_theme)
 
     # 此循环是将35关的图片加载到按钮里 并将按钮加入菜单中
     for i in range(1,36):
@@ -168,7 +198,7 @@ def main():
     # ------------------------------------------------------------------
     # 主循环 此方法相当于循环函数一直循环此主菜单
     # ---------------------------------------------------------------
-    main_menu.mainloop(surface)
+    main_menu.mainloop(surface, disable_loop=False, fps_limit=60, onloop=lambda: handle_joystick_input(pygame.event.get(), main_menu))
 # 调用main函数
 if __name__ == "__main__":
     main()
