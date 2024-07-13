@@ -19,7 +19,7 @@ import special_effects
 推荐：如果想要了解大体框架，将所有的方法缩小（就是将函数内容隐藏） 这样更有条理
 """
 class Game:
-    def __init__(self):
+    def __init__(self, joystick0, joystick1, joystick2):
         # 通用加载
         # ----------------------------------------------------------------------------
         pygame.init()
@@ -140,29 +140,9 @@ class Game:
         # 基地是否是砖块
         self.iron_time = 0
 
-
-        pygame.joystick.init()
-
-        print("joystick count :", pygame.joystick.get_count() )
-        # 打开第一个游戏手柄
-        self.joystick0 = pygame.joystick.Joystick(0)
-        print("joystick ssid: ", self.joystick0.get_guid())
-        print("joystick instanc id: ", self.joystick0.get_instance_id())
-        self.joystick0.init()
-
-        # 打开第二个游戏手柄
-        if(pygame.joystick.get_count() == 2):
-            self.joystick1 = pygame.joystick.Joystick(1)
-            print("joystick ssid: ", self.joystick1.get_guid())
-            print("joystick instanc id: ", self.joystick1.get_instance_id())
-            self.joystick1.init()
-
-        # 打开第三个游戏手柄
-        if(pygame.joystick.get_count() == 3):
-            self.joystick2 = pygame.joystick.Joystick(2)
-            print("joystick ssid: ", self.joystick2.get_guid())
-            print("joystick instanc id: ", self.joystick2.get_instance_id())
-            self.joystick2.init()
+        self.joystick0 = joystick0
+        self.joystick1 = joystick1
+        self.joystick2 = joystick2
 
     # 暂停函数----------------------------------------------------------------
     # 功能：点击鼠标进行暂停 并显示图片在桌面
@@ -315,6 +295,8 @@ class Game:
         joystick0_hat0 = self.joystick0.get_hat(0)
         joystick1_buttonA = self.joystick1.get_button(0)
         joystick1_hat0 = self.joystick1.get_hat(0)
+        joystick2_buttonA = self.joystick2.get_button(0)
+        joystick2_hat0 = self.joystick2.get_hat(0)
         # 玩家一的移动、射击操作
         # 参数 moving movdir alltankGroup self.bgMap.brickGroup, self.bgMap.ironGroup,self.bgMap.riverGroup
         if self.myTank_T1.life > 0:  # 如果有生命
@@ -504,7 +486,8 @@ class Game:
                     self.running_T3 = True
 
             if not self.moving3:
-                if key_pressed[pygame.K_UP]:
+                # if key_pressed[pygame.K_UP]:
+                if(joystick2_hat0[0] == 0 and joystick2_hat0[1] == 1):
                     self.allTankGroup.remove(self.myTank_T3)
                     self.myTank_T3.moveUp(self.allTankGroup, self.bgMap.brickGroup, self.bgMap.ironGroup,
                                           self.bgMap.riverGroup)
@@ -512,7 +495,8 @@ class Game:
                     self.moving3 = 7
                     self.movdir3 = 0
                     self.running_T3 = True
-                elif key_pressed[pygame.K_DOWN]:
+                # elif key_pressed[pygame.K_DOWN]:
+                elif(joystick2_hat0[0] == 0 and joystick2_hat0[1] == -1):
                     self.allTankGroup.remove(self.myTank_T3)
                     self.myTank_T3.moveDown(self.allTankGroup, self.bgMap.brickGroup, self.bgMap.ironGroup,
                                             self.bgMap.riverGroup)
@@ -520,7 +504,8 @@ class Game:
                     self.moving3 = 7
                     self.movdir3 = 1
                     self.running_T3 = True
-                elif key_pressed[pygame.K_LEFT]:
+                # elif key_pressed[pygame.K_LEFT]:
+                elif(joystick2_hat0[0] == -1 and joystick2_hat0[1] == 0):
                     self.allTankGroup.remove(self.myTank_T3)
                     self.myTank_T3.moveLeft(self.allTankGroup, self.bgMap.brickGroup, self.bgMap.ironGroup,
                                             self.bgMap.riverGroup)
@@ -528,7 +513,8 @@ class Game:
                     self.moving3 = 7
                     self.movdir3 = 2
                     self.running_T3 = True
-                elif key_pressed[pygame.K_RIGHT]:
+                # elif key_pressed[pygame.K_RIGHT]:
+                elif(joystick2_hat0[0] == 1 and joystick2_hat0[1] == 0):
                     self.allTankGroup.remove(self.myTank_T3)
                     self.myTank_T3.moveRight(self.allTankGroup, self.bgMap.brickGroup, self.bgMap.ironGroup,
                                              self.bgMap.riverGroup)
@@ -537,7 +523,7 @@ class Game:
                     self.movdir3 = 3
                     self.running_T3 = True
             # 如果点击0 则是发射子弹
-            if key_pressed[pygame.K_0]:
+            if joystick2_buttonA == 1:
                 if not self.myTank_T3.bullet.life:
                     if self.isSoundEffect:
                         self.attack_sound.play()
@@ -909,14 +895,14 @@ class Game:
 
                     # 敌方子弹碰撞到我方坦克3
                     if pygame.sprite.collide_rect(each.bullet, self.myTank_T3):
-                        if self.invincible_T2 > 0:
+                        if self.invincible_T3 > 0:
                             if self.isSoundEffect:
                                 self.bang_sound.play()
                             each.bullet.life = False
                         else:
                             if self.isSoundEffect:
                                 self.bang_sound.play()
-                            self.myTank_T3.rect.left, self.myTank_T3.rect.top = 3 + 16 * 24, 3 + 24 * 24
+                            self.myTank_T3.rect.left, self.myTank_T3.rect.top = 3 + 24 * 24, 3 + 24 * 24
                             each.bullet.life = False
                             if not self.isEndless:
                                 self.myTank_T3.life -= 1
@@ -1245,7 +1231,7 @@ class Game:
                 self.myTank_T2.rect.left, self.myTank_T2.rect.top = 3 + 16 * 24, 3 + 24 * 24
                 if self.isSoundEffect:
                     self.add_sound.play()
-            # 按F2复活玩家3
+            # 按F3复活玩家3
             if key_pressed[pygame.K_F3] and self.myTank_T3.life == 0:
                 self.myTank_T3.life = 3
                 self.myTank_T3.rect.left, self.myTank_T3.rect.top = 3 + 24 * 24, 3 + 24 * 24
@@ -1257,7 +1243,7 @@ class Game:
             if self.myTank_T2.life == 0:
                 self.myTank_T2.rect.left, self.myTank_T2.rect.top = 680, 0
             if self.myTank_T3.life == 0:
-                self.myTank_T3.rect.left, self.myTank_T3.rect.top = 630, 0
+                self.myTank_T3.rect.left, self.myTank_T3.rect.top = 700, 0
             # --------------------------------------------------------------------------
             # 处理事件部分 主要就是各个事件的时间
             # ---------------------------------------------------------------------------
