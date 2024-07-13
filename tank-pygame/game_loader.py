@@ -157,6 +157,13 @@ class Game:
             print("joystick instanc id: ", self.joystick1.get_instance_id())
             self.joystick1.init()
 
+        # 打开第三个游戏手柄
+        if(pygame.joystick.get_count() == 3):
+            self.joystick2 = pygame.joystick.Joystick(2)
+            print("joystick ssid: ", self.joystick2.get_guid())
+            print("joystick instanc id: ", self.joystick2.get_instance_id())
+            self.joystick2.init()
+
     # 暂停函数----------------------------------------------------------------
     # 功能：点击鼠标进行暂停 并显示图片在桌面
     def game_pause(self):
@@ -299,16 +306,10 @@ class Game:
     # 玩家操作检测函数--------------------------------------------------------
     # 功能：对键盘进行检测 并对玩家一和玩家二的操作进行移动
     def operation_detection_section(self):
-
-
-        # print(self.joystick0.get_button(0))
-        # print(self.joystick0.get_hat(0)[0], self.joystick0.get_hat(0)[1])
         #上0，1
         #下0，-1
         #左-1， 0
         #右1，0
-
-
         key_pressed = pygame.key.get_pressed()
         joystick0_buttonA = self.joystick0.get_button(0)
         joystick0_hat0 = self.joystick0.get_hat(0)
@@ -906,6 +907,24 @@ class Game:
                                 self.myTank_T2.levelDown()
                             self.invincible_T2 = 200
 
+                    # 敌方子弹碰撞到我方坦克3
+                    if pygame.sprite.collide_rect(each.bullet, self.myTank_T3):
+                        if self.invincible_T2 > 0:
+                            if self.isSoundEffect:
+                                self.bang_sound.play()
+                            each.bullet.life = False
+                        else:
+                            if self.isSoundEffect:
+                                self.bang_sound.play()
+                            self.myTank_T3.rect.left, self.myTank_T3.rect.top = 3 + 16 * 24, 3 + 24 * 24
+                            each.bullet.life = False
+                            if not self.isEndless:
+                                self.myTank_T3.life -= 1
+                            self.moving2 = 0  # 重置移动控制参数
+                            for i in range(self.myTank_T3.level + 1):
+                                self.myTank_T3.levelDown()
+                            self.invincible_T3 = 200
+
                     # 子弹 碰撞 brickGroup
                     if pygame.sprite.spritecollide(each.bullet, self.bgMap.brickGroup, True, None):
                         each.bullet.life = False
@@ -1092,6 +1111,41 @@ class Game:
                     if self.myTank_T2.life < 3:
                         self.myTank_T2.life += 1
                     self.prop.life = False
+            # 如果是坦克三碰到道具
+            elif pygame.sprite.collide_rect(self.myTank_T3, self.prop):
+                if self.isSoundEffect:
+                    self.get_props_sound.play()
+                if self.prop.kind == 1:  # 敌人全毁
+                    self.prop_boom_sound.play()
+                    for each in self.allEnemyGroup:
+                        if pygame.sprite.spritecollide(each, self.allEnemyGroup, True, None):
+                            self.enemyNumber -= 1
+                            if not self.isEndless:
+                                self.remaining_enemy -=1
+                    self.prop.life = False
+                if self.prop.kind == 2:  # 敌人静止
+                    self.enemyCouldMove = False
+                    self.prop.life = False
+                if self.prop.kind == 3:  # 子弹增强
+                    self.myTank_T3.bullet.strong = True
+                    self.prop.life = False
+                if self.prop.kind == 4:  # 家得到保护
+                    for x, y in [(11, 23), (12, 23), (13, 23), (14, 23), (11, 24), (14, 24), (11, 25), (14, 25)]:
+                        self.bgMap.iron = wall.Iron()
+                        self.bgMap.iron.rect.left, self.bgMap.iron.rect.top = 3 + x * 24, 3 + y * 24
+                        self.bgMap.ironGroup.add(self.bgMap.iron)
+                    self.prop.life = False
+                    self.iron_time = 200
+                if self.prop.kind == 5:  # 坦克无敌
+                    self.prop.life = False
+                    self.invincible_T3 = 200
+                if self.prop.kind == 6:  # 坦克升级
+                    self.myTank_T3.levelUp()
+                    self.prop.life = False
+                if self.prop.kind == 7:  # 坦克生命+1
+                    if self.myTank_T3.life < 3:
+                        self.myTank_T3.life += 1
+                    self.prop.life = False
 
     # 游戏运行函数（普通和无尽模式）----------------------------------------------------
     # 功能：运行此函数就将运行游戏
@@ -1191,11 +1245,19 @@ class Game:
                 self.myTank_T2.rect.left, self.myTank_T2.rect.top = 3 + 16 * 24, 3 + 24 * 24
                 if self.isSoundEffect:
                     self.add_sound.play()
+            # 按F2复活玩家3
+            if key_pressed[pygame.K_F3] and self.myTank_T3.life == 0:
+                self.myTank_T3.life = 3
+                self.myTank_T3.rect.left, self.myTank_T3.rect.top = 3 + 24 * 24, 3 + 24 * 24
+                if self.isSoundEffect:
+                    self.add_sound.play()
             # 如果玩家死亡
             if self.myTank_T1.life == 0:
                 self.myTank_T1.rect.left, self.myTank_T1.rect.top = 630, 0
             if self.myTank_T2.life == 0:
                 self.myTank_T2.rect.left, self.myTank_T2.rect.top = 680, 0
+            if self.myTank_T3.life == 0:
+                self.myTank_T3.rect.left, self.myTank_T3.rect.top = 630, 0
             # --------------------------------------------------------------------------
             # 处理事件部分 主要就是各个事件的时间
             # ---------------------------------------------------------------------------
@@ -1258,7 +1320,12 @@ class Game:
                 # 画2P生命
                 for i in range(0, self.myTank_T2.life):
                     x = 680 + i * 20
-                    self.screen.blit(self.heart_icon, (x, 378+55))
+                    self.screen.blit(self.heart_icon, (x, 378+45))
+
+                # 画3P生命
+                for i in range(0, self.myTank_T3.life):
+                    x = 680 + i * 20
+                    self.screen.blit(self.heart_icon, (x, 378+85))
             # --------------------------------------------------------------
             # 画坦克---------------------------------------------------------
             # --------------------------------------------------------------
