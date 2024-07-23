@@ -15,6 +15,9 @@ tank_T1_2 = r"image\tank_T1_2.png"
 tank_T2_0 = r"image\tank_T2_0.png"
 tank_T2_1 = r"image\tank_T2_1.png"
 tank_T2_2 = r"image\tank_T2_2.png"
+tank_T3_0 = r"image\tank_T3_0.png"
+tank_T3_1 = r"image\tank_T3_1.png"
+tank_T3_2 = r"image\tank_T3_2.png"
 
 # 我方坦克类（继承了pygame的精灵类）
 class MyTank(pygame.sprite.Sprite):
@@ -33,6 +36,10 @@ class MyTank(pygame.sprite.Sprite):
             self.tank_L0_image = pygame.image.load(tank_T2_0).convert_alpha()
             self.tank_L1_image = pygame.image.load(tank_T2_1).convert_alpha()
             self.tank_L2_image = pygame.image.load(tank_T2_2).convert_alpha()
+        if playerNumber == 3:
+            self.tank_L0_image = pygame.image.load(tank_T3_0).convert_alpha()
+            self.tank_L1_image = pygame.image.load(tank_T3_1).convert_alpha()
+            self.tank_L2_image = pygame.image.load(tank_T3_2).convert_alpha()
         # 初始坦克为0级
         self.level = 0
         self.tank = self.tank_L0_image
@@ -48,6 +55,8 @@ class MyTank(pygame.sprite.Sprite):
             self.rect.left, self.rect.top = 3 + 24 * 8, 3 + 24 * 24
         if playerNumber == 2:
             self.rect.left, self.rect.top = 3 + 24 * 16, 3 + 24 * 24
+        if playerNumber == 3:
+            self.rect.left, self.rect.top = 3 + 24 * 24, 3 + 24 * 24
 
         # 坦克速度   坦克方向   坦克生命   子弹冷却
         self.speed = 3
