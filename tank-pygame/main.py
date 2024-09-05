@@ -2,17 +2,12 @@ import pygame
 import pygame_menu
 import game_loader
 import sys
-"""
-修改时间：2021.12.15
-修改人：2019051604048 詹孝东
-模块描述：
-此模块是游戏的入口文件也是游戏的菜单实现模块
-模块包括主菜单、关卡模式选择菜单、无尽模式选择菜单、单挑模式选择菜单、建造模式选择菜单
-点击相应按钮调用相应下面相应函数进行实现，详情请看下面
-"""
+
+joysticklist = []
+
 # 关卡模式
 def Level_mode(i):
-    game = game_loader.Game()
+    game = game_loader.Game(joysticklist[0],joysticklist[1],joysticklist[2])
     game.game_running(i,False)
 # 无尽模式
 def endless_mode(i):
@@ -25,6 +20,22 @@ def heads_up_mode(i):
 # 设置 未实现
 def set_up():
     pass
+
+
+# 处理摇杆输入
+def handle_joystick_input(events, menu):
+    for event in events:
+        if event.type == pygame.JOYAXISMOTION:
+            if event.axis == 1:  # 1号轴通常是垂直轴
+                if event.value < -0.5:
+                    menu.update(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_UP))
+                elif event.value > 0.5:
+                    menu.update(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_DOWN))
+        elif event.type == pygame.JOYBUTTONDOWN:
+            if event.button == 0:  # 0号按钮通常是第一个按钮
+                menu.update(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RETURN))
+
+
 
 def main():
     # ------------------------------------
@@ -60,7 +71,78 @@ def main():
 
     # pygame.quit()
 
+    # pygame.joystick.init()
 
+    # # 检查是否有连接的摇杆
+    # if pygame.joystick.get_count() == 0:
+    #     print("No joystick connected")
+    #     pygame.quit()
+    #     exit()
+
+    # # 获取第一个连接的摇杆
+    # joystick = pygame.joystick.Joystick(0)
+    # joystick.init()
+
+
+    pygame.joystick.init()
+
+    print("joystick count :", pygame.joystick.get_count() )
+    # 打开第一个游戏手柄
+    joystick0 = pygame.joystick.Joystick(0)
+    print("joystick ssid: ", joystick0.get_guid())
+    print("joystick instanc id: ", joystick0.get_instance_id())
+    joystick0.init()
+    joysticklist.append(joystick0)
+
+    # 打开第二个游戏手柄
+    if(pygame.joystick.get_count() >= 2):
+        joystick1 = pygame.joystick.Joystick(1)
+        print("joystick ssid: ", joystick1.get_guid())
+        print("joystick instanc id: ", joystick1.get_instance_id())
+        joystick1.init()
+        joysticklist.append(joystick1)
+
+    # 打开第三个游戏手柄
+    if(pygame.joystick.get_count() >= 3):
+        joystick2 = pygame.joystick.Joystick(2)
+        print("joystick ssid: ", joystick2.get_guid())
+        print("joystick instanc id: ", joystick2.get_instance_id())
+        joystick2.init()
+        joysticklist.append(joystick2)
+
+    mainjoystick = None
+    buttonpresscount = [0,0,0]
+
+    # 判断主手柄
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.JOYBUTTONDOWN:
+                print(f"{event.dict.get("joy")} Button {event.button} pressed")
+                if event.dict.get("button") == 7:
+                    buttonpresscount[event.dict.get("joy")] += 1
+                    print(buttonpresscount[event.dict.get("joy")])
+            elif event.type == pygame.JOYBUTTONUP:
+                print(f"Button {event.button} released")
+        
+            for index,item in enumerate(buttonpresscount):
+                if item == 5:
+                    mainjoystick = joysticklist[index]
+        if mainjoystick is not None:
+            break
+    
+    if mainjoystick.get_id() == 1:
+        joytmp = joysticklist[0]
+        joysticklist[0] = joysticklist[1]
+        joysticklist[1] = joytmp
+    if mainjoystick.get_id() == 2:
+        joytmp = joysticklist[0]
+        joysticklist[0] = joysticklist[2]
+        joysticklist[2] = joytmp
+
+
+            
     surface = pygame.display.set_mode((750, 630))
 
     # 创建加载界面的图片
@@ -87,9 +169,9 @@ def main():
     checkpoint_theme.widget_font_size = 25
 
     # 关卡模式“菜单”的创建
-    level_mode_menu = pygame_menu.Menu('Level Mode Menu:Choose a level', 750, 630, theme=checkpoint_theme)
+    level_mode_menu = pygame_menu.Menu('Level Mode', 750, 630, theme=checkpoint_theme)
     # 无尽模式“菜单”的创建
-    endless_mode_menu = pygame_menu.Menu('Endless Mode Menu:Choose a level', 750, 630, theme=checkpoint_theme)
+    endless_mode_menu = pygame_menu.Menu('Endless Mode', 750, 630, theme=checkpoint_theme)
 
     # 此循环是将35关的图片加载到按钮里 并将按钮加入菜单中
     for i in range(1,36):
@@ -168,7 +250,7 @@ def main():
     # ------------------------------------------------------------------
     # 主循环 此方法相当于循环函数一直循环此主菜单
     # ---------------------------------------------------------------
-    main_menu.mainloop(surface)
+    main_menu.mainloop(surface, disable_loop=False, fps_limit=60, onloop=lambda: handle_joystick_input(pygame.event.get(), main_menu))
 # 调用main函数
 if __name__ == "__main__":
     main()
