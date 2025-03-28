@@ -1,0 +1,22 @@
+{
+    "density": 1.0,
+    "temperature": 37.0,
+    "name": "Unknown",
+    "age": 0,
+    "gender": "Unknown",
+    "wood": 20.0,
+    "fire": 20.0,
+    "earth": 20.0,
+    "metal": 20.0,
+    "water": 20.0,
+    "wood_out": 1,
+    "fire_in": 1,
+    "fire_out": 1,
+    "earth_in": 1,
+    "earth_out": 1,
+    "metal_in": 1,
+    "metal_out": 1,
+    "water_in": 1,
+    "water_out": 1,
+    "wood_in": 1
+}
