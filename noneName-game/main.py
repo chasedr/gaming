@@ -9,10 +9,10 @@ from input_handlers import EventHandler
 
 def main() -> None:
     screen_width = 80
-    screen_height = 50
+    screen_height = 60
 
     map_width = 80
-    map_height = 45
+    map_height = 50
 
     tileset = tcod.tileset.load_tilesheet(
         "dejavu10x10_gs_tc.png", 32, 8, tcod.tileset.CHARMAP_TCOD

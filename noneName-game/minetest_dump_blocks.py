@@ -3,7 +3,7 @@ import time
 import sqlite3
 
 # 定义常量来模拟宏
-SEARCH_RANGE = 2
+SEARCH_RANGE = 20
 
 # 初始化 Minetest 连接
 mt = miney.Minetest()
@@ -52,15 +52,16 @@ while True:
                 'z': player_position['z'] - SEARCH_RANGE
             }
             position_p2 = {
-                'x': player_position['x'] + SEARCH_RANGE,
-                'y': player_position['y'] + SEARCH_RANGE,
-                'z': player_position['z'] + SEARCH_RANGE
+                'x': player_position['x'] + SEARCH_RANGE-1,
+                'y': player_position['y'] + SEARCH_RANGE-1,
+                'z': player_position['z'] + SEARCH_RANGE-1
             }
 
             # 一次性获取指定区域内的方块信息
             blocks = mt.node.get(position_p1, position_p2)
 
             new_data_count = 0
+            print(len(blocks))  # 打印获取的方块数量
             for block in blocks:
                 try:
                     # 插入数据到 SQLite 数据库，使用 INSERT OR IGNORE 避免重复插入

@@ -30,6 +30,34 @@ def new_tile(
     """Helper function for defining individual tile types """
     return np.array((walkable, transparent, dark), dtype=tile_dt)
 
+def parse_color_file(file_path):
+    colors = {}
+    with open(file_path, 'r') as file:
+        lines = file.readlines()[2:]  # Skip the first two lines
+        for line in lines:
+            line = line.strip()
+            # print(line)  # Print each line for debugging
+            if line:
+                try:
+                    key, r, g, b = line.split()
+                    colors[key] = (int(r), int(g), int(b))
+                except ValueError:
+                    continue
+    return colors
+
+color_file_path = "./maps/colors.txt"  # Replace with the actual file path
+parsed_colors = parse_color_file(color_file_path)
+print(len(parsed_colors))  # Print the parsed colors
+print(type(parsed_colors)) 
+
+
+# Combine parsed colors with new_tile
+for key, color in parsed_colors.items():
+    tile = new_tile(walkable=True, transparent=True, dark=(ord(" "), (255, 255, 255), color))
+    globals()[key] = tile
+minetestmapper_colors_tiles = globals().copy()
+
+
 
 floor = new_tile(
     walkable=True, transparent=True, dark=(ord(" "), (255, 255, 255), (50, 50, 150)),
