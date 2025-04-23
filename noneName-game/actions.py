@@ -22,6 +22,7 @@ class Action:
 
 class EscapeAction(Action):
     def perform(self, engine: Engine, entity: Entity) -> None:
+        entity.stop()
         raise SystemExit()
 
 
@@ -42,3 +43,23 @@ class MovementAction(Action):
             return  # Destination is blocked by a tile.
 
         entity.move(self.dx, self.dy)
+
+class ElevateAction(Action):
+    def __init__(self, elevate_direction: int):
+        super().__init__()
+        self.elevate_direction = elevate_direction
+
+    def perform(self, engine: Engine, entity: Entity) -> None:
+        if(self.elevate_direction > 0):
+            engine.game_map.elevate_up()
+        elif(self.elevate_direction < 0):
+            engine.game_map.elevate_down()
+
+class GameMapCenterMove(Action):
+    def __init__(self, dx: int, dz: int):
+        super().__init__()
+        self.dx = dx
+        self.dz = dz
+
+    def perform(self, engine: Engine, entity: Entity) -> None:
+        engine.game_map.centerlocation_dxdz(self.dx, self.dz)
