@@ -39,7 +39,8 @@ def parse_color_file(file_path):
             # print(line)  # Print each line for debugging
             if line:
                 try:
-                    key, r, g, b = line.split()
+                    values = line.split()
+                    key, r, g, b = values[:4]
                     colors[key] = (int(r), int(g), int(b))
                 except ValueError:
                     continue
@@ -64,4 +65,7 @@ floor = new_tile(
 )
 wall = new_tile(
     walkable=False, transparent=False, dark=(ord(" "), (255, 255, 255), (0, 0, 100)),
+)
+air = new_tile(
+    walkable=True, transparent=False, dark=(ord(" "), (255, 255, 255), (135, 206, 250)),
 )

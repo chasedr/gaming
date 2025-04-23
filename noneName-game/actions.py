@@ -22,6 +22,7 @@ class Action:
 
 class EscapeAction(Action):
     def perform(self, engine: Engine, entity: Entity) -> None:
+        entity.stop()
         raise SystemExit()
 
 

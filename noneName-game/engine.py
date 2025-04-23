@@ -33,3 +33,13 @@ class Engine:
         context.present(console)
 
         console.clear()
+
+
+class Rule:
+    def __init__(self):
+        # Initialize rule properties here
+        pass
+
+    def apply(self, engine: Engine):
+        # Implement the logic of the rule here
+        pass

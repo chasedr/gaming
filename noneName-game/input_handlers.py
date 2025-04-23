@@ -23,13 +23,13 @@ class EventHandler(tcod.event.EventDispatch[Action]):
         elif key == tcod.event.K_RIGHT:
             action = MovementAction(dx=1, dy=0)
         elif key == tcod.event.K_w:
-            action = GameMapCenterMove(dx=1, dz=0)
-        elif key == tcod.event.K_s:
-            action = GameMapCenterMove(dx=-1, dz=0)
-        elif key == tcod.event.K_a:
             action = GameMapCenterMove(dx=0, dz=1)
-        elif key == tcod.event.K_d:
+        elif key == tcod.event.K_s:
             action = GameMapCenterMove(dx=0, dz=-1)
+        elif key == tcod.event.K_a:
+            action = GameMapCenterMove(dx=1, dz=0)
+        elif key == tcod.event.K_d:
+            action = GameMapCenterMove(dx=-1, dz=0)
 
         elif key == tcod.event.K_ESCAPE:
             action = EscapeAction()

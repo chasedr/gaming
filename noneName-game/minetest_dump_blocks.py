@@ -3,7 +3,7 @@ import time
 import sqlite3
 
 # 定义常量来模拟宏
-SEARCH_RANGE = 20
+SEARCH_RANGE = 50
 
 # 初始化 Minetest 连接
 mt = miney.Minetest()
@@ -28,6 +28,15 @@ CREATE TABLE IF NOT EXISTS blocks (
 )
 ''')
 conn.commit()
+# 初始化mt.player[0]的position
+# mt.player[0].position = {
+#     'x': 256,
+#     'y': 4,
+#     'z': 256
+# }
+
+
+
 
 while True:
     try:
@@ -46,17 +55,26 @@ while True:
             print(player_position)
 
             # 定义搜索范围的两个端点
+            # position_p1 = {
+            #     'x': player_position['x'],
+            #     'y': player_position['y'],
+            #     'z': player_position['z']
+            # }
+            # position_p2 = {
+            #     'x': player_position['x'] + SEARCH_RANGE-1,
+            #     'y': player_position['y'] + SEARCH_RANGE-1,
+            #     'z': player_position['z'] + SEARCH_RANGE-1
+            # }
             position_p1 = {
-                'x': player_position['x'] - SEARCH_RANGE,
-                'y': player_position['y'] - SEARCH_RANGE,
-                'z': player_position['z'] - SEARCH_RANGE
+                'x': 0,
+                'y': 0,
+                'z': 0
             }
             position_p2 = {
-                'x': player_position['x'] + SEARCH_RANGE-1,
-                'y': player_position['y'] + SEARCH_RANGE-1,
-                'z': player_position['z'] + SEARCH_RANGE-1
+                'x': SEARCH_RANGE,
+                'y': SEARCH_RANGE,
+                'z': SEARCH_RANGE
             }
-
             # 一次性获取指定区域内的方块信息
             blocks = mt.node.get(position_p1, position_p2)
 
@@ -68,7 +86,7 @@ while True:
                     cursor.execute('''
                     INSERT OR IGNORE INTO blocks (x, y, z, name, param1, param2)
                     VALUES (?,?,?,?,?,?)
-                    ''', (block['x']+player_position['x'], block['y']+player_position['y'], block['z']+player_position['z'], block['name'], block['param1'], block['param2']))
+                    ''', (block['x'], block['y'], block['z'], block['name'], block['param1'], block['param2']))
                     if cursor.rowcount > 0:
                         new_data_count += 1
                 except sqlite3.IntegrityError:
@@ -82,8 +100,7 @@ while True:
             # 更新上一次的玩家位置
             last_player_position = player_position
 
-        # 等待 1 秒
-        time.sleep(1)
+        time.sleep(0.1)
 
     except Exception as e:
         print(f"发生错误: {e}")
