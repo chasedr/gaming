@@ -23,6 +23,320 @@ class SkinInterface:
 # 鼻子接口 不是持续打开接收窗口的，外界只有在特定时间（由肺定时的打开/关闭）才能输入信息
 # 嘴巴接口 不是持续打开接收窗口的，外界只有在特定时间（由嘴巴定时的打开/关闭）才能输入信息
 
+class Leg:
+    def __init__(self, length=1.0, strength=1.0):
+        """
+        Initialize a Leg instance.
+
+        Args:
+            length (float): The length of the leg (default is 1.0).
+            strength (float): The strength of the leg (default is 1.0).
+        """
+        self.length = length
+        self.strength = strength
+
+    def kick(self, force):
+        """
+        Perform a kick with a specified force.
+
+        Args:
+            force (float): The force of the kick.
+
+        Returns:
+            None
+        """
+        if force <= self.strength:
+            print(f"The leg performs a kick with a force of {force}.")
+        else:
+            print("The force exceeds the leg's strength. The kick is not successful.")
+
+    def walk(self, distance):
+        """
+        Simulate walking a certain distance.
+
+        Args:
+            distance (float): The distance to walk.
+
+        Returns:
+            None
+        """
+        print(f"The leg walks {distance} meters.")
+
+    def jump(self, height):
+        """
+        Simulate jumping to a certain height.
+
+        Args:
+            height (float): The height to jump.
+
+        Returns:
+            None
+        """
+        if height <= self.strength:
+            print(f"The leg jumps to a height of {height} meters.")
+        else:
+            print("The height exceeds the leg's strength. The jump is not successful.")
+
+    
+    move = walk
+
+
+class Eye:
+    def __init__(self, color="brown", vision=1.0):
+        """
+        Initialize an Eye instance.
+
+        Args:
+            color (str): The color of the eye (default is "brown").
+            vision (float): The vision clarity of the eye (default is 1.0, where 1.0 is normal vision).
+        """
+        self.color = color
+        self.vision = vision
+        self.is_open = False
+
+    def open_eye(self):
+        """
+        Open the eye to allow receiving visual information.
+
+        Returns:
+            None
+        """
+        self.is_open = True
+        print("The eye is now open.")
+
+    def close_eye(self):
+        """
+        Close the eye to stop receiving visual information.
+
+        Returns:
+            None
+        """
+        self.is_open = False
+        print("The eye is now closed.")
+
+    def blink(self):
+        """
+        Simulate a blink by closing and then opening the eye.
+
+        Returns:
+            None
+        """
+        self.close_eye()
+        self.open_eye()
+        print("The eye blinked.")
+
+    def see(self, object_description):
+        """
+        Simulate seeing an object if the eye is open.
+
+        Args:
+            object_description (str): A description of the object being seen.
+
+        Returns:
+            None
+        """
+        if self.is_open:
+            print(f"The eye sees: {object_description}.")
+        else:
+            print("The eye is closed and cannot see anything.")
+
+class Ear:
+    def __init__(self, sensitivity=1.0):
+        """
+        Initialize an Ear instance.
+
+        Args:
+            sensitivity (float): The sensitivity of the ear (default is 1.0, where 1.0 is normal sensitivity).
+        """
+        self.sensitivity = sensitivity
+        self.is_listening = True
+
+    def start_listening(self):
+        """
+        Enable the ear to start listening.
+
+        Returns:
+            None
+        """
+        self.is_listening = True
+        print("The ear is now listening.")
+
+    def stop_listening(self):
+        """
+        Disable the ear from listening.
+
+        Returns:
+            None
+        """
+        self.is_listening = False
+        print("The ear has stopped listening.")
+
+    def hear(self, sound):
+        """
+        Simulate hearing a sound if the ear is listening.
+
+        Args:
+            sound (str): A description of the sound being heard.
+
+        Returns:
+            None
+        """
+        if self.is_listening:
+            print(f"The ear hears: {sound}.")
+        else:
+            print("The ear is not listening and cannot hear anything.")
+
+
+
+class Mouse:
+    def __init__(self, dpi=800, buttons=3):
+        """
+        Initialize a Mouse instance.
+
+        Args:
+            dpi (int): The sensitivity of the mouse in dots per inch (default is 800).
+            buttons (int): The number of buttons on the mouse (default is 3).
+        """
+        self.dpi = dpi
+        self.buttons = buttons
+        self.position = (0, 0)  # Initial position of the mouse
+
+    def move(self, x, y):
+        """
+        Move the mouse to a new position.
+
+        Args:
+            x (int): The x-coordinate to move to.
+            y (int): The y-coordinate to move to.
+
+        Returns:
+            None
+        """
+        self.position = (x, y)
+        print(f"Mouse moved to position: {self.position}")
+
+    def click(self, button="left"):
+        """
+        Simulate a mouse button click.
+
+        Args:
+            button (str): The button to click ('left', 'right', 'middle').
+
+        Returns:
+            None
+        """
+        print(f"Mouse {button} button clicked.")
+
+    def scroll(self, direction="up"):
+        """
+        Simulate scrolling the mouse wheel.
+
+        Args:
+            direction (str): The direction to scroll ('up' or 'down').
+
+        Returns:
+            None
+        """
+        print(f"Mouse scrolled {direction}.")
+
+class Nose:
+    def __init__(self, sensitivity=1.0):
+        """
+        Initialize a Nose instance.
+
+        Args:
+            sensitivity (float): The sensitivity of the nose (default is 1.0, where 1.0 is normal sensitivity).
+        """
+        self.sensitivity = sensitivity
+        self.is_smelling = False
+
+    def start_smelling(self):
+        """
+        Enable the nose to start smelling.
+
+        Returns:
+            None
+        """
+        self.is_smelling = True
+        print("The nose is now smelling.")
+
+    def stop_smelling(self):
+        """
+        Disable the nose from smelling.
+
+        Returns:
+            None
+        """
+        self.is_smelling = False
+        print("The nose has stopped smelling.")
+
+    def smell(self, scent):
+        """
+        Simulate smelling a scent if the nose is enabled.
+
+        Args:
+            scent (str): A description of the scent being smelled.
+
+        Returns:
+            None
+        """
+        if self.is_smelling:
+            print(f"The nose smells: {scent}.")
+        else:
+            print("The nose is not smelling and cannot detect any scent.")
+
+class Memory:
+    def __init__(self):
+        """
+        Initialize a Memory instance with an empty list to store memories.
+        """
+        self.memories = []
+
+    def store_memory(self, memory):
+        """
+        Store a memory in the memory list.
+
+        Args:
+            memory (str): The memory to store.
+
+        Returns:
+            None
+        """
+        self.memories.append(memory)
+        print(f"Memory stored: {memory}")
+
+    def recall_memory(self, index):
+        """
+        Recall a memory by its index.
+
+        Args:
+            index (int): The index of the memory to recall.
+
+        Returns:
+            str: The recalled memory, or a message if the index is invalid.
+        """
+        if 0 <= index < len(self.memories):
+            return self.memories[index]
+        else:
+            return "Memory not found."
+
+    def forget_memory(self, index):
+        """
+        Forget a memory by its index.
+
+        Args:
+            index (int): The index of the memory to forget.
+
+        Returns:
+            None
+        """
+        if 0 <= index < len(self.memories):
+            forgotten = self.memories.pop(index)
+            print(f"Memory forgotten: {forgotten}")
+        else:
+            print("Memory not found.")
+
+
 class Person(SkinInterface, threading.Thread):
     def __init__(self, json_file_path):
         threading.Thread.__init__(self)
@@ -62,6 +376,11 @@ class Person(SkinInterface, threading.Thread):
             self.water_out = data.get('water_out', 1)
             self.wood_in = data.get('wood_in', 1)
 
+    def run(self):
+        while True:
+            self.transfer_energy()
+            time.sleep(1)
+            
     def apply_substance(self, substance):
         """
         Apply a given substance to the person. If the substance is already present,
@@ -133,10 +452,6 @@ class Person(SkinInterface, threading.Thread):
         else:
             print(f"Invalid element: {element}")
 
-    def run(self):
-        while True:
-            self.transfer_energy()
-            time.sleep(1)
 
     def transfer_energy(self):
         # Example energy transfer: 木 -> 火 -> 土 -> 金 -> 水 -> 木
