@@ -9,6 +9,9 @@ import random
 import json
 import threading
 import time
+import random
+import os
+import glob
 
 
 
@@ -52,15 +55,28 @@ class Leg:
 
     def walk(self, distance):
         """
-        Simulate walking a certain distance.
+        Simulate walking a certain distance and return random XYZ coordinates
+        whose sum equals the distance.
 
         Args:
-            distance (float): The distance to walk.
+            distance (float): The total distance to distribute.
 
         Returns:
-            None
+            tuple: (x, y, z) where x + y + z == distance, each >= 0 if distance >= 0.
         """
-        print(f"The leg walks {distance} meters.")
+        if distance < 0:
+            # For negative distance, allow negative coordinates by symmetry
+            # Generate two random numbers in [distance, 0] (since distance < 0)
+            x = random.uniform(distance, 0)
+            y = random.uniform(distance - x, 0)  # ensure z will be <= 0
+            z = distance - x - y
+        else:
+            # Generate x in [0, distance], then y in [0, distance - x]
+            x = random.uniform(0, distance)
+            y = random.uniform(0, distance - x)
+            z = distance - x - y
+
+        return (x, y, z)
 
     def jump(self, height):
         """
@@ -125,20 +141,52 @@ class Eye:
         self.open_eye()
         print("The eye blinked.")
 
-    def see(self, object_description):
+    def see(self, x, y, z):
         """
-        Simulate seeing an object if the eye is open.
+        读取 world/ 中的所有 JSON 文件，比对物体坐标与当前位置的距离。
+        如果距离小于 2，则打印出看到了什么。
 
         Args:
-            object_description (str): A description of the object being seen.
+            x (float): 观察者的 x 坐标。
+            y (float): 观察者的 y 坐标。
+            z (float): 观察者的 z 坐标。
 
         Returns:
             None
         """
-        if self.is_open:
-            print(f"The eye sees: {object_description}.")
-        else:
+        if not self.is_open:
             print("The eye is closed and cannot see anything.")
+            return
+
+        world_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'world')
+        pattern = os.path.join(world_dir, '*.json')
+        seen_names = []
+
+        for filepath in sorted(glob.glob(pattern)):
+            try:
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+            except (json.JSONDecodeError, IOError):
+                continue
+
+            objects = data.get('objects', [])
+            for obj in objects:
+                ox = obj.get('x', 0)
+                oy = obj.get('y', 0)
+                oz = obj.get('z', 0)
+                dx = x - ox
+                dy = y - oy
+                dz = z - oz
+                distance = (dx*dx + dy*dy + dz*dz) ** 0.5
+                if distance < 2:
+                    name = obj.get('name', '未知物体')
+                    seen_names.append(name)
+
+        if seen_names:
+            seen_str = '，'.join(seen_names)
+            print(f"看到了{seen_str}", x,y,z)
+        else:
+            print("什么都没看到", x,y,z)
 
 class Ear:
     def __init__(self, sensitivity=1.0):
@@ -340,45 +388,61 @@ class Memory:
 class Person(SkinInterface, threading.Thread):
     def __init__(self, json_file_path):
         threading.Thread.__init__(self)
-        # Initialize the five elements energy levels
-        self.wood = data.get('wood', 20.0)  # 木
-        self.fire = data.get('fire', 20.0)  # 火
-        self.earth = data.get('earth', 20.0)  # 土
-        self.metal = data.get('metal', 20.0)  # 金
-        self.water = data.get('water', 20.0)  # 水
-        # Initialize the coordinates
-        self.x = data.get('x', 0.0)
-        self.y = data.get('y', 0.0)
-        self.z = data.get('z', 0.0)
-        # Initialize vertical and horizontal angles
-        self.vertical_angle = data.get('vertical_angle', 0.0)
-        self.horizontal_angle = data.get('horizontal_angle', 0.0)
-        # 从 JSON 文件中读取密度和温度
+        # 读取 JSON 数据
         with open(json_file_path, 'r') as file:
             data = json.load(file)
-            self.density = data.get('density', 1.0)  # 从 JSON 文件中获取密度，默认值为 1.0
-            self.temperature = data.get('temperature', 37.0)  # 从 JSON 文件中获取温度，默认值为 37.0
-            self.environment_temperature = data.get('environment_temperature', 20.0)  # 从 JSON 文件中获取环境温度，默认值为 20.0
-            self.name = data.get('name', 'Unknown')
-            self.age = data.get('age', 0)
-            self.gender = data.get('gender', 'Unknown')
-            # Initialize an empty dictionary to store substances applied to the person
-            self.substances = {}
-            # Initialize the energy transfer values
-            self.wood_out = data.get('wood_out', 1)
-            self.fire_in = data.get('fire_in', 1)
-            self.fire_out = data.get('fire_out', 1)
-            self.earth_in = data.get('earth_in', 1)
-            self.earth_out = data.get('earth_out', 1)
-            self.metal_in = data.get('metal_in', 1)
-            self.metal_out = data.get('metal_out', 1)
-            self.water_in = data.get('water_in', 1)
-            self.water_out = data.get('water_out', 1)
-            self.wood_in = data.get('wood_in', 1)
+        # 现在 data 已定义，可以安全使用
+        self.wood = data.get('wood', 20.0)
+        self.fire = data.get('fire', 20.0)
+        self.earth = data.get('earth', 20.0)
+        self.metal = data.get('metal', 20.0)
+        self.water = data.get('water', 20.0)
+        self.x = data.get('x', 0)
+        self.y = data.get('y', 0)
+        self.z = data.get('z', 0)
+        self.vertical_angle = data.get('vertical_angle', 0.0)
+        self.horizontal_angle = data.get('horizontal_angle', 0.0)
+        self.density = data.get('density', 1.0)
+        self.temperature = data.get('temperature', 37.0)
+        self.environment_temperature = data.get('environment_temperature', 20.0)
+        self.name = data.get('name', 'Unknown')
+        self.age = data.get('age', 0)
+        self.gender = data.get('gender', 'Unknown')
+        self.substances = {}
+        # 转移速率（请确保 JSON 中有这些值，否则用默认值）
+        self.wood_out = data.get('wood_out', 1)
+        self.fire_in = data.get('fire_in', 1)
+        self.fire_out = data.get('fire_out', 1)
+        self.earth_in = data.get('earth_in', 1)
+        self.earth_out = data.get('earth_out', 1)
+        self.metal_in = data.get('metal_in', 1)
+        self.metal_out = data.get('metal_out', 1)
+        self.water_in = data.get('water_in', 1)
+        self.water_out = data.get('water_out', 1)
+        self.wood_in = data.get('wood_in', 1)
+        self.leg = Leg()
+        self.eye = Eye()
 
     def run(self):
         while True:
-            self.transfer_energy()
+            print(self.name)
+            random_bool = random.choice([True, False])
+            if random_bool:
+                dx, dy, dz = self.leg.move(1)  # 每次循环走 1 米
+                self.x += dx
+                self.y += dy
+                self.z += dz
+                self.wood -= 1 # 每次走路消耗 1 单位木能量
+            random_bool = random.choice([True, False])
+            if random_bool:
+                self.eye.blink()
+                self.eye.see(self.x, self.y, self.z) # 每次循环尝试看周围的物体
+                # 看到物体后，如果这个物体的能量叠加到自己身上能让自己的能量平衡，则增加到自己的喜欢列表上
+                # 看到物体后，如果这个物体的能量叠加到自己身上能让自己的能量不平衡，则增加到自己的讨厌列表上
+                # 看到喜欢的物体，根据程度，选择是否去接触这个物体，接触后能量会增加到自己身上
+                # 看到讨厌的物体，根据程度，选择是否去躲避
+                
+            #self.transfer_energy()
             time.sleep(1)
             
     def apply_substance(self, substance):
@@ -559,7 +623,7 @@ class Person(SkinInterface, threading.Thread):
         print(f"{self.name} is turning the orange with both hands.")
 
 # 示例用法
-person1 = Person("Alice", 30, "Female")
+#person1 = Person("Alice", 30, "Female")
 
 # 遇到橘子
-person1.encounter_orange()
+#person1.encounter_orange()
